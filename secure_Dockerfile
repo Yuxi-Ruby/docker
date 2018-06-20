@@ -1,0 +1,68 @@
+FROM ubuntu:trusty
+MAINTAINER Andrés Diaz <andres.diaz@yuxiglobal.com>
+
+ENV DEBIAN_FRONTEND noninteractive
+SHELL ["/bin/bash", "-l", "-c"]
+
+# Setup environment language
+RUN locale-gen en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
+USER root
+
+# Update system and install dependencies
+RUN apt-get update
+RUN apt-get upgrade -y
+RUN apt-get install -y \
+  build-essential \
+  openssl \
+  libpq-dev \
+  libreadline6 \
+  libreadline6-dev \
+  curl \
+  git-core \
+  zlib1g \
+  zlib1g-dev \
+  libssl-dev \
+  libyaml-dev \
+  libsqlite3-dev \
+  sqlite3 \
+  libxml2-dev \
+  libxslt-dev \
+  autoconf \
+  libc6-dev \
+  ncurses-dev \
+  automake \
+  libtool \
+  bison \
+  subversion \
+  libgmp-dev \
+  patch \
+  liblzma-dev
+RUN apt-get autoremove -y
+
+# Install Javascript Runtime
+RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - && apt-get install -y nodejs
+
+# Setup User
+ENV USER_NAME app
+RUN useradd -d /home/$USER_NAME -M $USER_NAME -s /bin/bash
+RUN mkdir /home/$USER_NAME
+RUN chown $USER_NAME:$USER_NAME /home/$USER_NAME
+RUN adduser $USER_NAME sudo
+RUN echo '$USER_NAME ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+USER $USER_NAME
+
+ENV RUBY_VERSIONS "2.5.1 2.2.2"
+
+# Install RVM
+RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+RUN \curl -sSL https://get.rvm.io | bash -s stable
+RUN source $HOME/.rvm/scripts/rvm
+
+# Install RUBY_VERSIONS
+RUN rvm autolibs disable
+RUN for version in $RUBY_VERSIONS; do echo "Now installing Ruby $version"; rvm install $version; rvm cleanup all; rvm use $version; gem update --system; gem install bundler; done

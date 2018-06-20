@@ -1,0 +1,17 @@
+FROM node:8
+
+RUN apt-get update
+
+# Set up working directory
+ENV APP /var/www/app
+RUN echo $APP
+RUN mkdir -p $APP
+WORKDIR $APP
+
+# Add application directory
+ADD . $APP
+
+ADD ./start.sh /tmp/start.sh
+RUN chmod 755 /tmp/start.sh
+
+#CMD bash /tmp/start.sh
