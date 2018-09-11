@@ -22,7 +22,7 @@ RUN apt-get autoremove -y
 # Install Javascript Runtime
 RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - && apt-get install -y nodejs
 
-ENV RUBY_VERSIONS "2.5.1 2.2.2"
+ENV RUBY_VERSIONS "2.5.1 2.4.2 2.2.2"
 
 # Install RVM
 RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
